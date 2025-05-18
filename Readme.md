@@ -6,9 +6,9 @@
 
 Устанавливаем пакетный менеджер uv: curl -LsSf https://astral.sh/uv/install.sh | sh
 
-Клонируем репозиторий с проектом: git clone https://github.com/DaVinci113/Effective_mobile
+Клонируем репозиторий с проектом: git clone https://github.com/DaVinci113/Effect_mob
 
-Переходим в папку с проектом: cd Effective_mobile/Effect_mob
+Переходим в папку с проектом: cd Effect_mob/Effect_mob
 
 Запуск миграций: uv run manage.py migrate
 
