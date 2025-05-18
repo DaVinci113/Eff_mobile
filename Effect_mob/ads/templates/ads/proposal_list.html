@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+  <p>СПИСОК ПРЕДЛОЖЕНИЙ</p>
+
+  <form action="{% url 'ads:proposal-filter' %}" method="get">
+    <div class="right-side my-4">
+          <h5 class="sear-head editContent">Роль</h5>
+          <ul class="w3layouts-box-list">
+            {% for role in view.get_send_or_receive %}
+            <li class="editContent">
+              <input type="checkbox" class="checked" name="role" value="{{role.0}}">
+              <span class="span editContent">{{ role.1 }}</span>
+            {% endfor %}
+          </ul>
+    </div>
+    <div class="right-side my-4">
+          <h5 class="sear-head editContent">Статус</h5>
+          <ul class="w3layouts-box-list">
+              {% for status in view.get_status %}
+                <li class="editContent">
+                    <input type="checkbox" class="checked" name="status" value="{{status.0}}">
+                    <span class="span editContent">{{ status.1 }}</span>
+                </li>
+              {% endfor %}
+          </ul>
+      </div>
+      <button type="submit">Найти</button>
+  </form>
+  {% for object in object_list %}
+  <ul>
+      <a href="{% url 'ads:proposal-detail' object.pk %}">{{ object }}</a>
+  </ul>
+  {% endfor %}
+
+{% endblock content %}

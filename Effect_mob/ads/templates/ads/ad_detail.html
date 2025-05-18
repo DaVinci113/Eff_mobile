@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+  <p>Детали объявления</p>
+    <ul>
+      <p>Заголовок: {{ object.title }}</p>
+      <p>Описание: {{ object.description }}</p>
+      <p>Image URL: {{ object.image_url }}</p>
+      <p>Категории:
+        {% for cat in object.category.all %}
+          {{ cat }}
+        {% endfor %}
+      </p>
+      <p>Состояние: {{ object.get_condition_display }}</p>
+    </ul>
+  {% if autor %}
+    <button onclick="location.href='{% url 'ads:ad-update' object.pk %}'" type="button">обновить</button> ||
+     <button onclick="location.href='{% url 'ads:ad-delete' object.pk %}'" type="button">удалить</button>
+  {% else %}
+  <form action="{% url 'ads:proposal' object.id %}" method="get">
+    <button type="submit">Сделать предложение</button>
+  </form>
+  {% endif %}
+{% endblock content %}

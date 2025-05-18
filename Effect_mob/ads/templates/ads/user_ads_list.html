@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+  <p>МОИ ОБЪЯВЛЕНИЯ</p>
+
+   <ul>
+  <form action="{% url 'ads:user-ad-search' %}" method="get">
+      <input type="search" name="q" placeholder="Поиск...">
+      <button type="submit">Поиск</button>
+  </form>
+  </ul>
+
+  {% if object_list %}
+    {% for ad in object_list %}
+      <ul>
+        <a href="{% url 'ads:ad-detail' ad.pk %}">{{ ad }}</a>
+      </ul>
+    {% endfor %}
+  {% else %}
+       Объявлений с такими параметрами нет!
+  {% endif %}
+{% endblock content %}

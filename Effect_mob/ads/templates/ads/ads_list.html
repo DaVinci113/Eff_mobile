@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+  <p>ВСЕ ОБЪЯВЛЕНИЯ</p>
+
+
+  <form action="{% url 'ads:ad-search' %}" method="get">
+    <input type="search" name="q" placeholder="Поиск...">
+    <button type="submit">Поиск</button>
+  </form>
+
+  <form action="{% url 'ads:ads-filter' %}" method="get">
+      <div class="left-side my-4">
+          <h5 class="sear-head editContent">Категории</h5>
+          <ul class="w3layouts-box-list">
+              {% for category in view.get_category %}
+                <li class="editContent">
+                    <input type="checkbox" class="checked" name="category" value="{{category.id}}">
+                    <span class="span editContent">{{ category }}</span>
+                </li>
+              {% endfor %}
+          </ul>
+      </div>
+      <div class="right-side my-4">
+          <h5 class="sear-head editContent">Состояние</h5>
+          <ul class="w3layouts-box-list">
+              {% for condition in view.get_condition %}
+                <li class="editContent">
+                    <input type="checkbox" class="checked" name="condition" value="{{condition.0}}">
+                    <span class="span editContent">{{ condition.1 }}</span>
+                </li>
+              {% endfor %}
+          </ul>
+      </div>
+      <button type="submit">Найти</button>
+  </form>
+  <p>
+    {% if object_list %}
+      {% for ad in object_list %}
+      <li>
+          <a href="{% url 'ads:ad-detail' ad.pk %}">{{ ad }}</a>
+      </li>
+      {% endfor %}
+    {% else %}
+       Объявлений с такими параметрами нет!
+    {% endif %}
+  </p>
+{% endblock content %}

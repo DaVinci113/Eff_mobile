@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+  <p>ПОЛУЧАЮ: {{ object.ad_receiver_id }}</p>
+  <p>ОТДАЮ: {{ object.ad_sender_id }}</p>
+  <p>КОММЕНТАРИЙ: {{ object.comment }}</p>
+  <p>СТАТУС ПРЕДЛОЖЕНИЯ: {{ object.get_status_display }}</p>
+<button onclick="location.href='{% url 'ads:proposal-update' proposal.pk %}'" type="button">обновить</button>
+{% endblock content %}
