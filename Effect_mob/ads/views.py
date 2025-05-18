@@ -10,6 +10,7 @@ from .forms import CreateAdForm, CreateProposalForm
 
 
 class Index(TemplateView):
+    """Главная страница"""
     template_name = 'ads/index.html'
 
 
@@ -82,6 +83,7 @@ class CreateAd(CreateView):
 
 
 class ConfirmCreateAd(TemplateView):
+    """Подтверждение создания объявления"""
     template_name = 'ads/confirmation.html'
 
 
