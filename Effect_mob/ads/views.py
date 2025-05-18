@@ -1,11 +1,18 @@
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView, TemplateView
 from .models import Ad, Category, ExchangeProposal
 from .forms import CreateAdForm, CreateProposalForm
 
 
 # Create your views here.
+
+
+class Index(TemplateView):
+    template_name = 'ads/index.html'
+
+
 class Filter:
     """Категории фильтрации"""
 
@@ -65,13 +72,17 @@ class CreateAd(CreateView):
 
     form_class = CreateAdForm
     template_name = 'ads/ad_create.html'
-    success_url = '/ads/user_ads'
+    success_url = reverse_lazy('ads:confirmation')
 
     def form_valid(self, form):
         instance = form.save(commit=False)
         instance.user = self.request.user
         instance.save()
         return super().form_valid(form)
+
+
+class ConfirmCreateAd(TemplateView):
+    template_name = 'ads/confirmation.html'
 
 
 class UpdateAd(UpdateView):

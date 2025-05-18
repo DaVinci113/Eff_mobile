@@ -14,7 +14,7 @@
     </form>
 </p>
   {% else %}
-    <p>Вы не авторизованы. Для записи войдите в систему</p>
+    <p>Вы не авторизованы. Войдите в систему</p>
     <p><button onclick="location.href='{% url 'users:login' %}'" type="button">Войти</button></p>
 {% endif %}
 <a href="{% url 'ads:ads-list' %}">ВСЕ ОБЪЯВЛЕНИЯ</a> |
