@@ -12,7 +12,6 @@
 
 Запуск миграций: uv run manage.py migrate, 
 uv run manage.py makemigrations ads,
-uv run manage.py makemigrations users,
 uv run manage.py migrate
 
 Создание суперпользователя: uv run manage.py createsuperuser.
