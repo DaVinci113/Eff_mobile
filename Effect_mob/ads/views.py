@@ -1,9 +1,9 @@
 from django.contrib.auth.models import User
-from django.db.models import Q
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView, UpdateView, DeleteView, DetailView, TemplateView
-from .models import Ad, Category, ExchangeProposal
+from .models import Ad, ExchangeProposal
 from .forms import CreateAdForm, CreateProposalForm
+from .utils import AuthorCheckMixin, SearchMixin, UserFilterMixin, FilterMixin, ProposalFilterMixin
 
 
 # Create your views here.
@@ -14,58 +14,38 @@ class Index(TemplateView):
     template_name = 'ads/index.html'
 
 
-class Filter:
-    """Категории фильтрации"""
-
-    def get_category(self):
-        return Category.objects.all().distinct()
-
-    def get_condition(self):
-        return Ad.CONDITION
-
-
-class AdsFilter(Filter, ListView):
+class AdsFilter(FilterMixin, ListView):
     """Фильтрует на основании выбора категории"""
 
     template_name = 'ads/ads_list.html'
 
     def get_queryset(self):
-        category = self.request.GET.getlist('category')
-        condition = self.request.GET.getlist('condition')
-        if category and condition:
-            return Ad.objects.filter(
-                category__in=category,
-                condition__in=condition
-            ).exclude(user=self.request.user)
-        elif condition:
-            return Ad.objects.filter(
-                condition__in=condition
-            ).exclude(user=self.request.user)
-        else:
-            return Ad.objects.filter(
-                category__in=category
-            ).exclude(user=self.request.user)
+        queryset = Ad.objects.exclude(user=self.request.user)
+        filter_params = {
+            'category' : self.request.GET.getlist('category'),
+            'condition' : self.request.GET.getlist('condition'),
+        }
+        return self.get_filtered_queryset(queryset, filter_params)
 
 
-class AdsList(AdsFilter, ListView):
+class AdsList(UserFilterMixin, AdsFilter, ListView):
     """Вывод чужих объявлений"""
 
-    # paginate_by = 5
     model = Ad
     template_name = 'ads/ads_list.html'
 
     def get_queryset(self):
-        return Ad.objects.exclude(user=self.request.user)
+        return self.get_user_filtered_queryset(exclude=True)
 
 
-class UserAdsList(Filter, ListView):
+class UserAdsList(UserFilterMixin, ListView):
     """Вывод своих объявлений"""
 
     model = Ad
     template_name = 'ads/user_ads_list.html'
 
     def get_queryset(self):
-        return Ad.objects.filter(user=self.request.user)
+        return self.get_user_filtered_queryset(exclude=False)
 
 
 class CreateAd(CreateView):
@@ -112,44 +92,30 @@ class DeleteAd(DeleteView):
     success_url = '/ads/user_ads/'
 
 
-class DetailAd(DetailView):
-    """Вывод подробной инф-ии по объявлению"""
-
+class DetailAd(AuthorCheckMixin, DetailView):
     model = Ad
     template_name = 'ads/ad_detail.html'
     pk_url_kwarg = 'ad_pk'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        if context['object'].user == self.request.user:
-            context['autor'] = True
-        else:
-            context['autor'] = False
-        return context
 
-
-class SearchAd(ListView):
-    """Поиск чужих объявлений по введденным данным"""
-
+class SearchAd(SearchMixin, UserFilterMixin, FilterMixin, ListView):
     model = Ad
     template_name = 'ads/ads_list.html'
 
     def get_queryset(self):
-        q = self.request.GET.get('q')
-        query = Ad.objects.filter(Q(title__icontains=q)|Q(description__icontains=q)).exclude(user=self.request.user)
-        return query
+        queryset = self.get_user_filtered_queryset(exclude=True)
+        return self.get_search_queryset(queryset)
 
 
-class SearchUserAd(ListView):
+class SearchUserAd(SearchMixin, UserFilterMixin, ListView):
     """Поиск своих объявлений по введденным данным"""
 
     model = Ad
     template_name = 'ads/user_ads_list.html'
 
     def get_queryset(self):
-        q = self.request.GET.get('q')
-        query = Ad.objects.filter(Q(title__icontains=q)|Q(description__icontains=q)).filter(user=self.request.user)
-        return query
+        queryset = self.get_user_filtered_queryset(exclude=False)
+        return self.get_search_queryset(queryset)
 
 
 class CreateProposal(CreateView):
@@ -183,7 +149,7 @@ class PropFilter:
         ]
 
 
-class ProposalFiltered(PropFilter, ListView):
+class ProposalFiltered(ProposalFilterMixin, ListView):
     """Список предложений с примененными фильтрами"""
 
     template_name = 'ads/proposal_list.html'
@@ -191,29 +157,13 @@ class ProposalFiltered(PropFilter, ListView):
     def get_queryset(self):
         status = self.request.GET.getlist('status')
         role = self.request.GET.getlist('role')
-        user = self.request.user
-        if len(role)<2 and 'sender' in role:
-            filter_by = ExchangeProposal.objects.filter(
-                sender=user
-            )
-        elif len(role)<2 and 'receiver' in role:
-            filter_by = ExchangeProposal.objects.filter(
-                receiver=user
-            )
-        else:
-            filter_by = ExchangeProposal.objects.filter(
-                Q(sender=user)|Q(receiver=user)
-            )
-        if status:
-            filter_by = filter_by.filter(
-                status__in=status
-            )
-        return filter_by
+
+        return self.get_proposal_queryset(self.request.user, role, status)
 
 
 
 
-class ProposalList(ProposalFiltered, ListView):
+class ProposalList(ProposalFilterMixin, ListView):
     """Список предложений"""
 
     model = ExchangeProposal
@@ -236,3 +186,5 @@ class ProposalUpdate(UpdateView):
     template_name = 'ads/proposal_update.html'
     pk_url_kwarg = 'proposal_pk'
     success_url = '/proposal'
+
+

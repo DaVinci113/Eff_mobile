@@ -12,15 +12,16 @@
       {% csrf_token %}
       <button name="submit">Выйти</button>
     </form>
+    <a href="{% url 'ads:ads-list' %}">ВСЕ ОБЪЯВЛЕНИЯ</a> |
+    <a href="{% url 'ads:user-ads' %}">МОИ ОБЪЯВЛЕНИЯ</a> |
+    <a href="{% url 'ads:proposal-list' %}">ПРОСМОТР ПРЕДЛОЖЕНИЙ</a> |
+    <a href="{% url 'ads:ad-create' %}">CОЗДАТЬ ОБЪЯВЛЕНИЕ</a> |
 </p>
   {% else %}
     <p>Вы не авторизованы. Войдите в систему</p>
     <p><button onclick="location.href='{% url 'users:login' %}'" type="button">Войти</button></p>
 {% endif %}
-<a href="{% url 'ads:ads-list' %}">ВСЕ ОБЪЯВЛЕНИЯ</a> |
-<a href="{% url 'ads:user-ads' %}">МОИ ОБЪЯВЛЕНИЯ</a> |
-<a href="{% url 'ads:proposal-list' %}">ПРОСМОТР ПРЕДЛОЖЕНИЙ</a> |
-<a href="{% url 'ads:ad-create' %}">CОЗДАТЬ ОБЪЯВЛЕНИЕ</a> |
+
 
 {% block content %}
 {% endblock content %}
